@@ -1,19 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const Joi = require('joi');
 const router = express.Router();
 
 
-const genereSchema = mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        minlength: 5,
-        maxlength: 50
-    }
-});
-
-const Genere = new mongoose.model('Genre', genereSchema)
+const {Genere, Validate} = require('../models/generes');
 
 
 
@@ -25,7 +15,7 @@ router.get('/', async (req, res) => {
 
 //POST ----> post method
 router.post('/', async (req, res) => {
-    const { error } = validateGenre(req.body);
+    const { error } = Validate(req.body);
 
     if (error) return res.status(400).send(error.details[0].message)
 
@@ -44,7 +34,7 @@ router.get('/:id', async(req, res) => {
 
 //update course
 router.put('/:id', async(req, res) => {
-    const {error} = validateGenre(req.body);
+    const {error} = Validate(req.body);
     if(error) return res.status(400).send(error.details[0].message);
 
     const genere = await Genere.findByIdAndUpdate(req.params.id,{
@@ -69,15 +59,5 @@ router.delete('/deleteGeneres/:id', async(req, res) => {
 })
 
 
-
-
-
-function validateGenre(genere) {
-    const schema = {
-        name: Joi.string().min(3).required()
-    }
-
-    return Joi.validate(genere, schema);
-}
 
 module.exports = router;
